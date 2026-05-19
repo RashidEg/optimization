@@ -4,45 +4,40 @@
     <meta charset="UTF-8">
     <title>Наши курсы</title>
     <style>
-        h1, h3, li {
-            font-weight: bold;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1, h3, li { font-weight: bold; }
     </style>
 </head>
 <body>
     <div id="result"></div>
+
     <script>
-        fetch('courses.xml')
-            .then(response => response.text())
-            .then(xmlText => {
-                return fetch('transform.xsl')
-                    .then(response => response.text())
-                    .then(xsltText => {
-                        const parser = new DOMParser();
-                        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
-                        const xsltDoc = parser.parseFromString(xsltText, 'application/xml');
-                        
-                        const processor = new XSLTProcessor();
-                        processor.importStylesheet(xsltDoc);
-                        const resultDoc = processor.transformToDocument(xmlDoc);
-                        
-                        const serializer = new XMLSerializer();
-                        let html = serializer.serializeToString(resultDoc);
-                        html = html.replace(/<\?xml.*?\?>/, '').trim();
-                        
-                        document.getElementById('result').innerHTML = html;
-                    });
-            })
-            .catch(error => {
-                document.getElementById('result').innerHTML = '<p style="color:red;">Ошибка: ' + error.message + '</p>';
-            });
-    </script>
-</body>
-</html>
+        function applyTransformation() {
+            fetch('courses.xml')
+                .then(response => response.text())
+                .then(xmlText => {
+                    return fetch('transform.xsl')
+                        .then(response => response.text())
+                        .then(xsltText => {
+                            const parser = new DOMParser();
+                            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+                            const xsltDoc = parser.parseFromString(xsltText, 'application/xml');
+                            
+                            const processor = new XSLTProcessor();
+                            processor.importStylesheet(xsltDoc);
+                            const resultDoc = processor.transformToDocument(xmlDoc);
+                            
+                            const serializer = new XMLSerializer();
+                            let html = serializer.serializeToString(resultDoc);
+                            html = html.replace(/<\?xml.*?\?>/, '').trim();
+                            
+                            document.getElementById('result').innerHTML = html;
+                        });
+                })
+                .catch(error => {
+                    document.getElementById('result').innerHTML = '<p style="color:red;">Ошибка: ' + error.message + '</p>';
+                });
+        }
         applyTransformation();
     </script>
 </body>
